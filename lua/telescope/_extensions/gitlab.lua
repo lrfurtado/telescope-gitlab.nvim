@@ -49,7 +49,8 @@ local glab_issues = function(opts)
 		else
 			state = "💩(open)  "
 		end
-		table.insert(issues, string.format("%-42s", v.references.full) .. "|" .. state .. "|" .. v.title)
+		v.funny_state = state
+		table.insert(issues, v)
 	end
 	pickers
 		.new(opts, {
@@ -58,18 +59,26 @@ local glab_issues = function(opts)
 				results = issues,
 			}),
 			sorter = conf.generic_sorter(opts),
+			entry_maker = function(entry)
+				content = string.format("%-42s", entry.references.full)
+					.. "|"
+					.. entry.funny_state
+					.. "|"
+					.. entry.title
+				return {
+					value = entry,
+					display = content,
+					ordinal = content,
+				}
+			end,
 		})
 		:find()
 end
 
-
--- stylua: ignore start
 return telescope.register_extension({
-  setup = function(optsExt, opts)
-  end,
-  exports = {
-    issues            = glab_issues,
-  },
+	setup = function(optsExt, opts) end,
+	exports = {
+		issues = glab_issues,
+	},
 })
--- stylua: ignore end
 --glab_issues({ fields = { state = "opened" } })
