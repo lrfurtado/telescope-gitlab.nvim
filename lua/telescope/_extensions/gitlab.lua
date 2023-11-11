@@ -15,6 +15,7 @@ local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local conf = require("telescope.config").values
 local utils = require "telescope.utils"
+local log = require "telescope.log"
 
 local glab_command = function(args, opts)
   opts = opts or {}
@@ -37,7 +38,9 @@ local glab_command = function(args, opts)
 end
 
 local get_glab_command_json = function(args, opts)
-  return utils.get_os_command_output(glab_command(args, opts), opts.cwd, opts.timeout)
+  cmd = glab_command(args, opts)
+  log.trace("get_glab_command_json: ", vim.inspect(cmd))
+  return utils.get_os_command_output(cmd, opts.cwd, opts.timeout)
 end
 
 local glab_issues = function(opts)
@@ -58,7 +61,6 @@ local glab_issues = function(opts)
   if opts.state then
     opts.fields.state = opts.state
   end
-  print(vim.inspect(opts))
   output = get_glab_command_json({ "/issues" }, opts)
 
   o = vim.json.decode(output[1])
