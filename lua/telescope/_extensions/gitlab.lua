@@ -67,6 +67,11 @@ local glab_issues = function(opts)
   if not opts.fields then
     opts.fields = {}
   end
+
+  if opts.search then
+    opts.fields.search = opts.search
+  end
+
   if opts.assignee then
     opts.fields.assignee_username = opts.assignee
   end
@@ -149,9 +154,102 @@ local glab_issues = function(opts)
     :find()
 end
 
+local glab_mrs = function(opts)
+  opts = opts or {}
+
+  if not opts.fields then
+    opts.fields = {}
+  end
+
+  if opts.labels then
+    opts.fields.labels = opts.labels
+  end
+
+  if opts.search then
+    opts.fields.search = opts.search
+  end
+
+  if opts.reviewer then
+    opts.fields.reviewer_username = opts.reviewer
+  end
+
+  if opts.author then
+    opts.fields.author_username = opts.author
+  end
+
+  if opts.scope then
+    opts.fields.scope = opts.scope
+  end
+  if opts.state then
+    opts.fields.state = opts.state
+  end
+  output = get_glab_command_json({ "/merge_requests" }, opts)
+
+  o = vim.json.decode(table.concat(output, ""))
+  issues = {}
+  for _, v in ipairs(o) do
+    if v.value.state == "closed" then
+      state = "😀(closed)"
+    else
+      state = "💩(open)  "
+    end
+    v.value.funny_state = state
+    table.insert(issues, v.value)
+  end
+
+  pickers
+    .new(opts, {
+      prompt_title = "Glab Mrs",
+      finder = finders.new_table {
+        results = issues,
+        entry_maker = function(entry)
+          content = string.format("%-42s|%s|%s", entry.references.full, entry.funny_state, entry.title)
+          return {
+            value = entry,
+            display = content,
+            ordinal = content,
+          }
+        end,
+      },
+      sorter = conf.generic_sorter(opts),
+      attach_mappings = function(prompt_bufnr, map)
+        actions.select_default:replace(function()
+          actions.close(prompt_bufnr)
+          local selection = action_state.get_selected_entry()
+          utils.get_os_command_output { "open", selection.value.web_url }
+        end)
+        local run_command = function()
+          local selection = action_state.get_selected_entry()
+          actions.close(prompt_bufnr)
+          vim.api.nvim_put(
+            { string.format("(%s)[%s]", selection.value.references.full, selection.value.web_url) },
+            "c",
+            true,
+            true
+          )
+        end
+
+        map("n", "p", run_command)
+        return true
+      end,
+      previewer = previewers.new_buffer_previewer {
+        title = "gitlab issue preview",
+        define_preview = function(self, entry, status)
+          content_table = {}
+          table.insert(content_table, string.format("Title     : %s", entry.value.title))
+          table.insert(content_table, string.format("URL       : %s", entry.value.web_url))
+
+          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, content_table)
+        end,
+      },
+    })
+    :find()
+end
+
 return telescope.register_extension {
   setup = function(optsExt, opts) end,
   exports = {
     issues = glab_issues,
+    mrs = glab_mrs,
   },
 }
