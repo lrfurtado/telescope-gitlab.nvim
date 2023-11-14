@@ -17,6 +17,22 @@ local conf = require("telescope.config").values
 local utils = require "telescope.utils"
 local log = require "telescope.log"
 
+local has_glab = vim.fn.executable "glab" == 1
+if not has_glab then
+  utils.notify("telescope-gitlab", {
+    msg = "This plugin requires the glab binary",
+    level = "ERROR",
+  })
+end
+
+local has_jq = vim.fn.executable "jq" == 1
+if not has_jq then
+  utils.notify("telescope-gitlab", {
+    msg = "This plugin requires the jq binary",
+    level = "ERROR",
+  })
+end
+
 local glab_command = function(args, opts)
   opts = opts or {}
 
@@ -34,12 +50,14 @@ local glab_command = function(args, opts)
     end
   end
 
-  return vim.list_extend(_args, args)
+  _args = vim.list_extend(_args, args)
+  wrapped_cmd = { "/bin/sh", "-c", table.concat(_args, " ") .. "| jq -s 'map(to_entries) | flatten'" }
+  return wrapped_cmd
 end
 
 local get_glab_command_json = function(args, opts)
   cmd = glab_command(args, opts)
-  log.trace("get_glab_command_json: ", vim.inspect(cmd))
+  log.info("get_glab_command_json: ", table.concat(cmd, " "))
   return utils.get_os_command_output(cmd, opts.cwd, opts.timeout)
 end
 
@@ -63,17 +81,18 @@ local glab_issues = function(opts)
   end
   output = get_glab_command_json({ "/issues" }, opts)
 
-  o = vim.json.decode(output[1])
+  o = vim.json.decode(table.concat(output, ""))
   issues = {}
   for _, v in ipairs(o) do
-    if v.state == "closed" then
+    if v.value.state == "closed" then
       state = "😀(closed)"
     else
       state = "💩(open)  "
     end
-    v.funny_state = state
-    table.insert(issues, v)
+    v.value.funny_state = state
+    table.insert(issues, v.value)
   end
+
   pickers
     .new(opts, {
       prompt_title = "Glab Issues",

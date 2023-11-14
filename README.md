@@ -5,7 +5,9 @@ Gaze deeply into unknown gitlab issues using the power of telescope-gitlan.nvim.
 
 ### Installation
 
-you need to install gitlab cli (version 1.25.3 or greater) first [glab cli](https://docs.gitlab.com/ee/editor_extensions/gitlab_cli/#install-the-cli)
+1. install gitlab cli (version 1.25.3 or greater)  [glab cli](https://docs.gitlab.com/ee/editor_extensions/gitlab_cli/#install-the-cli)
+1. install [jq](https://stedolan.github.io/jq/download/)
+
 
 #### Packer
 ```lua
