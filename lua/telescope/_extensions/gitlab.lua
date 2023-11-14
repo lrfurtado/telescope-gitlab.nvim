@@ -186,22 +186,22 @@ local glab_mrs = function(opts)
   output = get_glab_command_json({ "/merge_requests" }, opts)
 
   o = vim.json.decode(table.concat(output, ""))
-  issues = {}
+  mrs = {}
   for _, v in ipairs(o) do
-    if v.value.state == "closed" then
-      state = "😀(closed)"
+    if v.value.state == "merged" then
+      state = "✅ (merged)"
     else
-      state = "💩(open)  "
+      state = "💩(" .. v.value.state .. ")  "
     end
     v.value.funny_state = state
-    table.insert(issues, v.value)
+    table.insert(mrs, v.value)
   end
 
   pickers
     .new(opts, {
       prompt_title = "Glab Mrs",
       finder = finders.new_table {
-        results = issues,
+        results = mrs,
         entry_maker = function(entry)
           content = string.format("%-42s|%s|%s", entry.references.full, entry.funny_state, entry.title)
           return {
