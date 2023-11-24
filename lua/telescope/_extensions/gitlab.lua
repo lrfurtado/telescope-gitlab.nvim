@@ -28,7 +28,6 @@ if not has_jq then
   })
 end
 
-
 local char_to_hex = function(c)
   return string.format("%%%02X", string.byte(c))
 end
@@ -55,7 +54,6 @@ local urldecode = function(url)
   url = url:gsub("%%(%x%x)", hex_to_char)
   return url
 end
-
 
 local glab_command = function(args, opts)
   opts = opts or {}
@@ -107,6 +105,10 @@ local glab_issues = function(opts)
   end
   if opts.state then
     opts.fields.state = opts.state
+  end
+
+  if opts.labels then
+    opts.fields.labels = opts.labels
   end
   output = get_glab_command_json({ "/issues" }, opts)
 

@@ -20,12 +20,20 @@ use({
 })
 ```
 ## Available commands
+
+
 ```viml
 Telescope gitlab issues
 
 "Using lua function
 :lua require('telescope').extensions.gitlab.issues({fields={state="opened"}})<cr>
 
+Telescope gitlab mrs
+
+"Search for projects
+Telescope gitlab repos
+
+Telescope gitlab search
 ```
 
 ## Options
@@ -38,16 +46,15 @@ Telescope gtlab issues state=opened<cr>
 ```
 
 ### Issue
-
+[Issues API](https://docs.gitlab.com/ee/api/issues.html)
 #### Options Filter
-[Detail](https://cli.github.com/manual/gh_issue_list)
-
-| Query    | filter                               |
-|----------|--------------------------------------|
-| author   | Filter by author                     |
-| assignee | Filter by assignee                   |
-| state    | Filter by state: {opened,closed}     |
-| scope    | Filter by scope: {all}               |
+| Query    | filter                                  |
+|----------|-----------------------------------------|
+| author   | Filter by author                        |
+| assignee | Filter by assignee                      |
+| state    | Filter by state: {opened,closed}        |
+| scope    | Filter by scope: {all}                  |
+| fields   | Filter by passing all gitlab api fields |
 
 #### Key mappings
 
@@ -55,3 +62,55 @@ Telescope gtlab issues state=opened<cr>
 |---------|-------------------------------------|
 | `<cr>`  | open web                            |
 | `<c-p>` | insert a markdown-link to the issue |
+
+### Merge Request
+[Merge Requests API](https://docs.gitlab.com/ee/api/merge_requests.html)
+#### Options Filter
+
+| Query    | filter                                  |
+|----------|-----------------------------------------|
+| author   | Filter by author                        |
+| reviewer | Filter by reviewer                      |
+| state    | Filter by state: {opened,closed}        |
+| scope    | Filter by scope: {all}                  |
+| fields   | Filter by passing all gitlab api fields |
+| labels   | Filter by labels                        |
+| search   | Filter by text search                   |
+
+#### Key mappings
+
+| key     | Usage                               |
+|---------|-------------------------------------|
+| `<cr>`  | open web                            |
+
+### Repo
+[Projects API](https://docs.gitlab.com/ee/api/projects.html)
+#### Options Filter
+| Query    | filter                                  |
+|----------|-----------------------------------------|
+| search   | Filter by text search                   |
+| fields   | Filter by passing all gitlab api fields |
+
+#### Key mappings
+
+| key     | Usage                               |
+|---------|-------------------------------------|
+| `<cr>`  | open web                            |
+| `<c-p>` | insert a markdown-link to the issue |
+
+### Search
+[Search API](https://docs.gitlab.com/ee/api/search.html)
+#### Options Filter
+
+| Query  | filter                                  |
+|--------|-----------------------------------------|
+| author | Filter by author                        |
+| scope  | Filter by scope: {blob,issues}          |
+| query  | Filter by text search                   |
+| fields | Filter by passing all gitlab ali fields |
+
+#### Key mappings
+
+| key     | Usage                               |
+|---------|-------------------------------------|
+| `<cr>`  | open web                            |
